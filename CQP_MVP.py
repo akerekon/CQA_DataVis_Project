@@ -1,4 +1,5 @@
 import os
+import subprocess
 import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 
@@ -110,7 +111,46 @@ def create_line_chart(data, title="Line Chart", x_label="X-axis", y_label="Y-axi
     plt.close(fig)
     print(f"Saved chart as {filename}")
 
+def generate_chart_data_from_pdf(input_file):
+    #pdf = open(input_file)
+    svg_name = "output_test.svg"
 
+    subprocess.run(["C:\\Program Files\\Inkscape\\bin\\inkscape.com", "--export-plain-svg=" + svg_name, input_file])
+
+    svg_file = open(svg_name)
+    line_buffer = ""
+    for line in svg_file:
+        line_buffer = line_buffer + line
+    prompt = '''Generate a .txt file that describes the chart within the following SVG file. For example: 
+            Title of the chart is "Inflation Rates Over the Last 10 Years".
+            • Chart type is a bar chart.
+            • Chart created using matplotlib.
+            • X-axis is labeled "Year".
+            • Y-axis is labeled "Inflation Rate (%)".
+            • Data points are colored in skyblue.
+            • The chart measures inflation rates from 2015 to 2024.
+            • Year 2015 had 1.5 percent inflation.
+            • Year 2016 had 1.8 percent inflation.
+            • Year 2017 had 2.1 percent inflation.
+            • Year 2018 had 2.5 percent inflation.
+            • Year 2019 had 2.3 percent inflation.
+            • Year 2020 had 1.2 percent inflation.
+            • Year 2021 had 3.4 percent inflation.
+            • Year 2022 had 4.2 percent inflation.
+            • Year 2023 had 5.1 percent inflation.
+            • Year 2024 had 6.8 percent inflation.
+            • X-axis ticks are rotated 45 degrees for better readability.
+            • The layout is adjusted for tight fitting of the chart elements
+    '''
+    response = agent.chat(prompt + " " + line_buffer)
+
+    output = open("./test_files/sample_chart_description.txt", "a")
+    output.write(response)
+    output.close()
+
+    return output
+    
+    #print(f"{response}")
 
 # Define the bar chart creation tool
 bar_chart_tool = FunctionTool.from_defaults(
@@ -127,6 +167,18 @@ line_chart_tool = FunctionTool.from_defaults(
     description="Generates a dynamic line chart based on provided data and parameters."
 )
 
+def pdf_processing(pdf_file):
+    text_docs = SimpleDirectoryReader(
+        input_files=[pdf_file]
+    ).load_data()
+
+    output_text = generate_chart_data_from_pdf(pdf_file)
+
+    chart_docs = SimpleDirectoryReader(
+        input_files=[output_text]
+    ).load_data()
+
+    return text_docs, chart_docs
 
 try:
     storage_context = StorageContext.from_defaults(
@@ -145,12 +197,7 @@ except:
 
 if not index_loaded:
     # load data
-    text_docs = SimpleDirectoryReader(
-        input_files=["./test_files/inflation2024_report.pdf"]
-    ).load_data()
-    chart_docs = SimpleDirectoryReader(
-        input_files=["./test_files/inflation2024_data_chart.pdf"]
-    ).load_data()
+    text_docs, chart_docs = pdf_processing("./test_files/bar_chart_intermediate.pdf")
 
     # build index
     text_index = VectorStoreIndex.from_documents(text_docs)
@@ -193,7 +240,7 @@ obj_index = ObjectIndex.from_objects(
     index_cls=VectorStoreIndex,
 )
 
-llm = OpenAI(model="gpt-3.5-turbo")
+llm = OpenAI(model="gpt-4-turbo")
 agent_worker = FunctionCallingAgentWorker.from_tools(
     tool_retriever=obj_index.as_retriever(similarity_top_k=5),
     llm=llm,
@@ -201,7 +248,6 @@ agent_worker = FunctionCallingAgentWorker.from_tools(
     allow_parallel_tool_calls=True,
 )
 agent = AgentRunner(agent_worker)
-
 
 
 
@@ -244,17 +290,17 @@ def process_inquiry_and_show_latest_image(question):
     return None  # Return None if no file was created
 
 
-# def main(): 
-#     while True:
-#         question = input("Ask your question (type 'exit' to quit): ")
-#         if question.lower() == 'exit':
-#             print("Goodbye!")
-#             break
-#         response = process_inquiry_and_show_latest_image(question)
-#         print("Response:", response)
+def main(): 
+    while True:
+        question = input("Ask your question (type 'exit' to quit): ")
+        if question.lower() == 'exit':
+            print("Goodbye!")
+            break
+        response = process_inquiry_and_show_latest_image(question)
+        print("Response:", response)
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
 
 
 

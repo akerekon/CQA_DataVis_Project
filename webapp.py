@@ -6,7 +6,7 @@ from llama_index.llms.openai import OpenAI
 from llama_index.core.agent import FunctionCallingAgentWorker, AgentRunner
 from PIL import Image
 # Initialize OpenAI model
-llm = OpenAI(model="gpt-3.5-turbo")
+llm = OpenAI(model="gpt-4-turbo")
 
 # Initialize AgentRunner
 agent_worker = FunctionCallingAgentWorker.from_tools(
@@ -38,7 +38,7 @@ st.title('Chart Question Answering')
 col2, col1 = st.columns(2)  # Adjusted the order here
 # col1.markdown("###     CQA Tool Instruction will be displayed here") 
 # col1.image(Image.open("./img/tool_function_overview.png").resize((int(0.8 * Image.open("./img/tool_function_overview.png").width), int(0.8 * Image.open("./img/tool_function_overview.png").height))))
-col1.image(Image.open("./img/inflationreport.png").resize((int(.8 * Image.open("./img/tool_function_overview.png").width), int(1.8 * Image.open("./img/tool_function_overview.png").height))))
+col1.image(Image.open("./img/embedded.png").resize((int(.8 * Image.open("./img/tool_function_overview.png").width), int(1.8 * Image.open("./img/tool_function_overview.png").height))))
 
 col2.markdown("### Chat, inquire, and modify the chart")
 
