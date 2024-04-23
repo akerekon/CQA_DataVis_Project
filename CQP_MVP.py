@@ -2,6 +2,8 @@ import os
 import subprocess
 import matplotlib.pyplot as plt
 from dotenv import load_dotenv
+import openai
+
 
 # Import classes related to the agent setup
 from llama_index.llms.openai import OpenAI
@@ -111,17 +113,17 @@ def create_line_chart(data, title="Line Chart", x_label="X-axis", y_label="Y-axi
     plt.close(fig)
     print(f"Saved chart as {filename}")
 
-def generate_chart_data_from_pdf(input_file):
+def generate_chart_data_from_pdf():
     #pdf = open(input_file)
-    svg_name = "output_test.svg"
+    #svg_name = "output_test.svg"
 
-    subprocess.run(["C:\\Program Files\\Inkscape\\bin\\inkscape.com", "--export-plain-svg=" + svg_name, input_file])
+    #subprocess.run(["C:\\Program Files\\Inkscape\\bin\\inkscape.com", "--export-plain-svg=" + svg_name, input_file])
 
-    svg_file = open(svg_name)
+    svg_file = open("./test_files/chart-title.svg")
     line_buffer = ""
     for line in svg_file:
         line_buffer = line_buffer + line
-    prompt = '''Generate a .txt file that describes the chart within the following SVG file. For example: 
+    prompt = '''Generate a .txt file that describes the chart within the following SVG file. Describe all categories. For example: 
             Title of the chart is "Inflation Rates Over the Last 10 Years".
             • Chart type is a bar chart.
             • Chart created using matplotlib.
@@ -141,14 +143,29 @@ def generate_chart_data_from_pdf(input_file):
             • Year 2024 had 6.8 percent inflation.
             • X-axis ticks are rotated 45 degrees for better readability.
             • The layout is adjusted for tight fitting of the chart elements
+
+            Below is the SVG data: 
     '''
-    response = agent.chat(prompt + " " + line_buffer)
 
-    output = open("./test_files/sample_chart_description.txt", "a")
-    output.write(response)
-    output.close()
+    # Use the OpenAI API for Query and Response
+    load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    response = openai.chat.completions.create(
+        model="gpt-4",
+        messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": line_buffer}
+        ]
+    )
 
-    return output
+    # Extracting text response from the OpenAI response object
+    response = response.choices[0].message.content
+
+    print(response)
+
+    with open("test_files/sample_chart_description.txt", "w") as f:
+        f.write(response)
+        return f
     
     #print(f"{response}")
 
@@ -172,7 +189,7 @@ def pdf_processing(pdf_file):
         input_files=[pdf_file]
     ).load_data()
 
-    output_text = generate_chart_data_from_pdf(pdf_file)
+    output_text = generate_chart_data_from_pdf()
 
     chart_docs = SimpleDirectoryReader(
         input_files=[output_text]

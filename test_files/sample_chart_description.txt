@@ -1,0 +1,23 @@
+The provided SVG file renders a chart with the following characteristics:
+
+Title: "Chart title"
+- The chart doesn't have any subtitle or caption.
+- The chart appears to be a type of line chart, specifically a spline series, with interactive points.
+- The maximum Y-value appears to be 100, and the minimum is 40.
+- There are six categories on the X-axis, labelled "Category 1" to "Category 6".
+- The labels on the Y-axis range from 40 to 100, suggesting that the chart shows percentages.
+- The line/series is represented in a green colour (#94d13d).
+- Each data point on the chart is represented by a green dot.
+- Judging by the size of the SVG viewport, this graph is 650 pixels wide and 400 pixels tall.
+
+Data points:
+- Category 1 has a value of nearly 67.
+- Category 2 scores the higher with a value close to 90.
+- Category 3 drops to a value around 46.
+- Category 4 sits at about 55.
+- Category 5 shoots up again to about 85.
+- Category 6 ends at around 43.
+
+Please note: Data values are estimated from the SVG code. Actual values might slightly differ.
+
+Lastly, the chart's legend is positioned at the bottom-center of the chart, mentioning "Item 2" represented by a green line, matching the colour of the series on the plot. The chart was created using Highcharts v10.3.1 as an SVG image.
