@@ -122,7 +122,22 @@ def generate_chart_data_from_pdf(pdf_file):
 
     print("Inkscape done!")
 
-    svg_file = open(pdf_file + ".svg")
+    return generate_chart_data_from_svg(output_svg_name)
+
+def generate_pdf_from_svg(svg_file):
+    print("Running inkscape...")
+
+    output_pdf_name = svg_file + ".pdf"
+    completed = subprocess.run(["inkscape", "--export-filename=" + output_pdf_name, svg_file])
+    print(completed.stdout)
+    print(completed.stderr)
+
+    print("Inkscape done!")
+
+    return output_pdf_name
+    
+def generate_chart_data_from_svg(svg_file):
+    svg_file = open(svg_file)
 
     line_buffer = ""
     for line in svg_file:
@@ -154,10 +169,10 @@ def generate_chart_data_from_pdf(pdf_file):
 
     print(response)
 
-    with open(pdf_file + "chart_description.txt", "w") as f:
+    with open(svg_file + "chart_description.txt", "w") as f:
         f.write(response)
         print(f"{response}")
-        return pdf_file + "chart_description.txt"
+        return svg_file + "chart_description.txt"
     
     
 
@@ -182,6 +197,20 @@ def pdf_processing(pdf_file):
     ).load_data()
 
     output_text = generate_chart_data_from_pdf(pdf_file)
+
+    chart_docs = SimpleDirectoryReader(
+        input_files=[output_text]
+    ).load_data()
+
+    return text_docs, chart_docs
+
+def svg_processing(svg_file):
+    pdf_file = generate_pdf_from_svg(svg_file)
+    text_docs = SimpleDirectoryReader(
+        input_files=[pdf_file]
+    ).load_data()
+
+    output_text = generate_chart_data_from_svg(svg_file)
 
     chart_docs = SimpleDirectoryReader(
         input_files=[output_text]
