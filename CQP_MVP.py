@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 import openai
 
-
 # Import classes related to the agent setup
 from llama_index.llms.openai import OpenAI
 from llama_index.core.agent import ReActAgent, FunctionCallingAgentWorker, AgentRunner
@@ -113,59 +112,51 @@ def create_line_chart(data, title="Line Chart", x_label="X-axis", y_label="Y-axi
     plt.close(fig)
     print(f"Saved chart as {filename}")
 
-def generate_chart_data_from_pdf():
-    #pdf = open(input_file)
-    #svg_name = "output_test.svg"
+def generate_chart_data_from_pdf(pdf_file):
+    print("Running inkscape...")
 
-    #subprocess.run(["C:\\Program Files\\Inkscape\\bin\\inkscape.com", "--export-plain-svg=" + svg_name, input_file])
+    output_svg_name = pdf_file + "test_output.svg"
+    completed = subprocess.run(["inkscape", "--export-filename=" + output_svg_name, pdf_file])
+    print(completed.stdout)
+    print(completed.stderr)
 
-    svg_file = open("./test_files/chart-title.svg")
-    line_buffer = ""
-    for line in svg_file:
-        line_buffer = line_buffer + line
-    prompt = '''Generate a .txt file that describes the chart within the following SVG file. Describe all categories. For example: 
-            Title of the chart is "Inflation Rates Over the Last 10 Years".
-            • Chart type is a bar chart.
-            • Chart created using matplotlib.
-            • X-axis is labeled "Year".
-            • Y-axis is labeled "Inflation Rate (%)".
-            • Data points are colored in skyblue.
-            • The chart measures inflation rates from 2015 to 2024.
-            • Year 2015 had 1.5 percent inflation.
-            • Year 2016 had 1.8 percent inflation.
-            • Year 2017 had 2.1 percent inflation.
-            • Year 2018 had 2.5 percent inflation.
-            • Year 2019 had 2.3 percent inflation.
-            • Year 2020 had 1.2 percent inflation.
-            • Year 2021 had 3.4 percent inflation.
-            • Year 2022 had 4.2 percent inflation.
-            • Year 2023 had 5.1 percent inflation.
-            • Year 2024 had 6.8 percent inflation.
-            • X-axis ticks are rotated 45 degrees for better readability.
-            • The layout is adjusted for tight fitting of the chart elements
+    print("Inkscape done!")
 
-            Below is the SVG data: 
-    '''
+    # svg_file = open(pdf_file + ".svg")
 
-    # Use the OpenAI API for Query and Response
-    load_dotenv()
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-    response = openai.chat.completions.create(
-        model="gpt-4",
-        messages=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": line_buffer}
-        ]
-    )
+    # line_buffer = ""
+    # for line in svg_file:
+    #     line_buffer = line_buffer + line
+    # prompt = '''Generate a .txt file that describes the chart within the following SVG file. Label every data point. For example: 
+    #         Title of the chart is "Apple Stock Price Over the Last 10 Years".
+    #         • Chart type is a bar chart.
+    #         • Chart created using matplotlib.
+    #         • X-axis is labeled "Year".
+    #         • Y-axis is labeled "Stock Price ($)".
+    #         • Data points are colored in skyblue.
+    #         • The chart measures stock price rates from 2015 to 2024.
+    #         • Year 2015 was $27.06.
+    #         • Year 2016 was $24.06.
+    #         • Year 2017 was $35.29.'''
+    # # Use the OpenAI API for Query and Response
+    # load_dotenv()
+    # openai.api_key = os.getenv("OPENAI_API_KEY")
+    # response = openai.chat.completions.create(
+    #     model="gpt-4-turbo",
+    #     messages=[
+    #             {"role": "system", "content": prompt},
+    #             {"role": "user", "content": line_buffer}
+    #     ]
+    # )
 
-    # Extracting text response from the OpenAI response object
-    response = response.choices[0].message.content
+    # # Extracting text response from the OpenAI response object
+    # response = response.choices[0].message.content
 
-    print(response)
+    # print(response)
 
-    with open("test_files/sample_chart_description.txt", "w") as f:
-        f.write(response)
-        return f
+    # with open("test_files/" + pdf_file + "chart_description.txt", "w") as f:
+    #     f.write(response)
+    #     return "test_files/" + pdf_file + "chart_description.txt"
     
     #print(f"{response}")
 
@@ -189,7 +180,7 @@ def pdf_processing(pdf_file):
         input_files=[pdf_file]
     ).load_data()
 
-    output_text = generate_chart_data_from_pdf()
+    output_text = generate_chart_data_from_pdf(pdf_file)
 
     chart_docs = SimpleDirectoryReader(
         input_files=[output_text]
@@ -214,7 +205,7 @@ except:
 
 if not index_loaded:
     # load data
-    text_docs, chart_docs = pdf_processing("./test_files/bar_chart_intermediate.pdf")
+    text_docs, chart_docs = pdf_processing("./test_files/final.pdf")
 
     # build index
     text_index = VectorStoreIndex.from_documents(text_docs)
