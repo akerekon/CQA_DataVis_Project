@@ -1,0 +1,17 @@
+Title of the chart is "Inflation Rates Over The Last 10 Years".
+• Chart type is a line chart.
+• Chart created using Highcharts.
+• X-axis is labeled "Year" with values ranging from 2015 to 2024.
+• Y-axis is labeled "Inflation Rate (%)" with values ranging from 0 to 8.
+• Data points are colored in purple.
+• The chart traces the inflation rate for each year from 2015 to 2024.
+• Year 2015: Inflation rate approx. 2%.
+• Year 2016: Inflation rate approx. 2%.
+• Year 2017: Inflation rate approx. 3%.
+• Year 2018: Inflation rate approx. 1.8%.
+• Year 2019: Inflation rate approx. 2%.
+• Year 2020: Inflation rate approx. 2.3%.
+• Year 2021: Inflation rate approx. 3.2%.
+• Year 2022: Inflation rate approx. 2.5%.
+• Year 2023: Inflation rate approx. 1.5%.
+• Year 2024: Inflation rate approx. 6.8%.

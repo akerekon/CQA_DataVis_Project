@@ -115,50 +115,51 @@ def create_line_chart(data, title="Line Chart", x_label="X-axis", y_label="Y-axi
 def generate_chart_data_from_pdf(pdf_file):
     print("Running inkscape...")
 
-    output_svg_name = pdf_file + "test_output.svg"
+    output_svg_name = pdf_file + ".svg"
     completed = subprocess.run(["inkscape", "--export-filename=" + output_svg_name, pdf_file])
     print(completed.stdout)
     print(completed.stderr)
 
     print("Inkscape done!")
 
-    # svg_file = open(pdf_file + ".svg")
+    svg_file = open(pdf_file + ".svg")
 
-    # line_buffer = ""
-    # for line in svg_file:
-    #     line_buffer = line_buffer + line
-    # prompt = '''Generate a .txt file that describes the chart within the following SVG file. Label every data point. For example: 
-    #         Title of the chart is "Apple Stock Price Over the Last 10 Years".
-    #         • Chart type is a bar chart.
-    #         • Chart created using matplotlib.
-    #         • X-axis is labeled "Year".
-    #         • Y-axis is labeled "Stock Price ($)".
-    #         • Data points are colored in skyblue.
-    #         • The chart measures stock price rates from 2015 to 2024.
-    #         • Year 2015 was $27.06.
-    #         • Year 2016 was $24.06.
-    #         • Year 2017 was $35.29.'''
-    # # Use the OpenAI API for Query and Response
-    # load_dotenv()
-    # openai.api_key = os.getenv("OPENAI_API_KEY")
-    # response = openai.chat.completions.create(
-    #     model="gpt-4-turbo",
-    #     messages=[
-    #             {"role": "system", "content": prompt},
-    #             {"role": "user", "content": line_buffer}
-    #     ]
-    # )
+    line_buffer = ""
+    for line in svg_file:
+        line_buffer = line_buffer + line
+    prompt = '''Generate a .txt file that describes the chart within the following SVG file. Label every data point. For example: 
+            Title of the chart is "Apple Stock Price Over the Last 10 Years".
+            • Chart type is a bar chart.
+            • Chart created using matplotlib.
+            • X-axis is labeled "Year".
+            • Y-axis is labeled "Stock Price ($)".
+            • Data points are colored in skyblue.
+            • The chart measures stock price rates from 2015 to 2024.
+            • Year 2015 was $27.06.
+            • Year 2016 was $24.06.
+            • Year 2017 was $35.29.'''
+    # Use the OpenAI API for Query and Response
+    load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    response = openai.chat.completions.create(
+        model="gpt-4-turbo",
+        messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": line_buffer}
+        ]
+    )
 
-    # # Extracting text response from the OpenAI response object
-    # response = response.choices[0].message.content
+    # Extracting text response from the OpenAI response object
+    response = response.choices[0].message.content
 
-    # print(response)
+    print(response)
 
-    # with open("test_files/" + pdf_file + "chart_description.txt", "w") as f:
-    #     f.write(response)
-    #     return "test_files/" + pdf_file + "chart_description.txt"
+    with open(pdf_file + "chart_description.txt", "w") as f:
+        f.write(response)
+        print(f"{response}")
+        return pdf_file + "chart_description.txt"
     
-    #print(f"{response}")
+    
 
 # Define the bar chart creation tool
 bar_chart_tool = FunctionTool.from_defaults(
